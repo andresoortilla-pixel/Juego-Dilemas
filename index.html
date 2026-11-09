@@ -1,0 +1,1727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crónicas de la U | Juego Pixel Art de Dilemas Morales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pixel-bg: #121324;
+            --pixel-panel: #1e2038;
+            --pixel-border: #4a4e7d;
+            --pixel-gold: #fbbf24;
+            --pixel-cyan: #2dd4bf;
+            --pixel-red: #f43f5e;
+            --pixel-green: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--pixel-bg);
+            background-image: 
+                radial-gradient(circle at 50% 0%, #2e1065 0%, #121324 65%),
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+            color: #f8fafc;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-pixel {
+            font-family: 'Press Start 2P', monospace;
+            line-height: 1.5;
+        }
+
+        .font-vt {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Bordes estilo consola retro 16-bits */
+        .pixel-box {
+            background: var(--pixel-panel);
+            border: 4px solid #6366f1;
+            box-shadow: 
+                0 6px 0 #312e81,
+                0 12px 24px rgba(0, 0, 0, 0.6),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+
+        .pixel-btn {
+            position: relative;
+            background: #27294a;
+            border: 3px solid #6366f1;
+            box-shadow: 0 5px 0 #312e81;
+            border-radius: 10px;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease, border-color 0.15s ease;
+            cursor: pointer;
+        }
+
+        .pixel-btn:hover {
+            background: #323561;
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #1e3a8a;
+        }
+
+        .pixel-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 #312e81;
+        }
+
+        .pixel-btn-gold {
+            background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+            border: 3px solid #fef08a;
+            box-shadow: 0 5px 0 #92400e;
+            color: #0f172a;
+            font-weight: 800;
+        }
+
+        .pixel-btn-gold:hover {
+            background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+            border-color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 7px 0 #92400e;
+        }
+
+        /* Lienzo Pixel Art nítido */
+        canvas.pixelated {
+            image-rendering: -moz-crisp-edges;
+            image-rendering: -webkit-crisp-edges;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+        }
+
+        /* Animación de cofre/regalo pixelado */
+        @keyframes giftShake {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            20% { transform: translateY(-8px) rotate(-6deg) scale(1.06); }
+            40% { transform: translateY(0) rotate(6deg) scale(1.06); }
+            60% { transform: translateY(-5px) rotate(-4deg) scale(1.03); }
+            80% { transform: translateY(0) rotate(4deg) scale(1.03); }
+        }
+
+        .gift-shake {
+            animation: giftShake 1.2s infinite ease-in-out;
+        }
+
+        @keyframes pulseAlert {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7), 0 6px 0 #881337; }
+            50% { box-shadow: 0 0 28px 8px rgba(244, 63, 94, 0.55), 0 6px 0 #881337; }
+        }
+
+        .chosen-alert-card {
+            animation: pulseAlert 1s infinite;
+            border-color: #f43f5e !important;
+            background: rgba(136, 19, 55, 0.35) !important;
+        }
+
+        /* Animación de ramas del árbol SVG */
+        @keyframes branchGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(45, 212, 191, 0.6)); }
+            50% { filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.95)); }
+        }
+
+        .active-branch {
+            animation: branchGlow 2s infinite ease-in-out;
+        }
+
+        /* Efecto Scanlines sutil estilo Arcade */
+        .scanlines {
+            position: relative;
+            overflow: hidden;
+        }
+        .scanlines::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Cursor parpadeante de diálogo RPG */
+        @keyframes blinkCursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        .rpg-cursor {
+            display: inline-block;
+            animation: blinkCursor 0.8s infinite;
+            color: #fbbf24;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="py-4 px-3 sm:px-6 flex flex-col items-center justify-start">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="w-full max-w-3xl mx-auto">
+
+        <!-- BARRA SUPERIOR ARCADE -->
+        <header class="pixel-box p-3 sm:p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-indigo-950 border-2 border-indigo-400 flex items-center justify-center text-xl shadow-inner">
+                    🕹️
+                </div>
+                <div>
+                    <span class="text-[10px] sm:text-xs font-pixel text-teal-300 tracking-wider block">GRUPO 4 · PSICOLOGÍA DEL DESARROLLO II</span>
+                    <h1 class="text-sm sm:text-base font-pixel text-amber-300 mt-0.5">EL ÁRBOL DE TUS DECISIONES</h1>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <!-- Botón de Sonido 8-Bit -->
+                <button id="btnMute" class="pixel-btn px-3 py-1.5 text-xs font-pixel text-slate-200 flex items-center gap-1.5" title="Activar/Silenciar Audio 8-Bit">
+                    <span id="muteIcon">🔊</span>
+                    <span class="hidden sm:inline" id="muteText">8-BIT ON</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- MINI-ÁRBOL DE PROGRESO EN VIVO (Visible durante el juego) -->
+        <div id="liveProgressContainer" class="hidden pixel-box p-3 mb-4 bg-slate-900/90">
+            <div class="flex items-center justify-between mb-2">
+                <span id="actIndicator" class="font-pixel text-[10px] sm:text-xs text-amber-300">ACTO 1 DE 3 · MAÑANA EN LA U</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-300 font-semibold">Tiempo de reacción:</span>
+                    <span id="timerNumber" class="font-pixel text-xs text-teal-300">25s</span>
+                </div>
+            </div>
+            <!-- Barra de tiempo pixelada -->
+            <div class="w-full h-3 bg-slate-950 rounded border-2 border-slate-700 overflow-hidden mb-3">
+                <div id="timerBar" class="h-full bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 transition-all duration-1000" style="width: 100%;"></div>
+            </div>
+            <!-- Mini-nodos del árbol formándose en vivo -->
+            <div class="flex items-center justify-between px-2 text-xs">
+                <div class="flex items-center gap-1.5">
+                    <span class="text-[11px] text-slate-400 font-semibold">Rama forjada:</span>
+                    <div id="liveBreadcrumbs" class="flex items-center gap-1.5 flex-wrap">
+                        <span class="px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500 text-indigo-200 font-vt text-base">🌱 Raíz</span>
+                    </div>
+                </div>
+                <span id="liveTreeCounter" class="font-vt text-lg text-amber-300">0/3 Ramas</span>
+            </div>
+        </div>
+
+        <!-- ==========================================
+             PANTALLA 1: INICIO (PORTADA PIXEL ART)
+             ========================================== -->
+        <main id="screenStart" class="pixel-box p-5 sm:p-7 text-center">
+            <!-- Escena Pixel Art de Portada -->
+            <div class="relative w-full h-44 sm:h-52 rounded-xl overflow-hidden border-4 border-indigo-950 bg-slate-950 mb-5 scanlines">
+                <canvas id="introCanvas" width="320" height="110" class="w-full h-full pixelated"></canvas>
+                <div class="absolute bottom-2 right-3 bg-slate-950/80 border border-amber-400/50 px-2.5 py-1 rounded text-[10px] font-pixel text-amber-300">
+                    MODO HISTORIA · 19-21 AÑOS
+                </div>
+            </div>
+
+            <h2 class="font-pixel text-base sm:text-xl text-white mb-3 leading-relaxed">
+                UN DÍA NORMAL EN LA UNIVERSIDAD... ¿O NO?
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6 leading-relaxed">
+                En la universidad tu criterio se pone a prueba en situaciones muy reales: <strong>una mejor amiga que no hizo su parte por irse de fiesta, un compañero que te cae mal pero sí trabajó, y la tentación de cometer una injusticia para salir del paso</strong>. Cada elección formará una rama de tu árbol moral.
+            </p>
+
+            <!-- Tarjetas de características del juego -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-left mb-6">
+                <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-lg p-3">
+                    <div class="text-xl mb-1">🌳</div>
+                    <h3 class="font-pixel text-[10px] text-teal-300 mb-1">ÁRBOL DINÁMICO</h3>
+                    <p class="text-xs text-slate-300">Cada elección abre una ruta distinta y forma tu árbol de decisiones al final.</p>
+                </div>
+                <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-lg p-3">
+                    <div class="text-xl mb-1">💬</div>
+                    <h3 class="font-pixel text-[10px] text-amber-300 mb-1">CASOS COTIDIANOS</h3>
+                    <p class="text-xs text-slate-300">Chismes, malentendidos, reclamos en grupo y presión de tus amigos cercanos.</p>
+                </div>
+                <div class="bg-slate-900/90 border-2 border-indigo-500/40 rounded-lg p-3">
+                    <div class="text-xl mb-1">🎁</div>
+                    <h3 class="font-pixel text-[10px] text-rose-300 mb-1">COFRE DE LA SUERTE</h3>
+                    <p class="text-xs text-slate-300">Al terminar abrirás un regalo para saber tu suerte.</p>
+                </div>
+            </div>
+
+            <!-- Input de Jugador -->
+            <div class="max-w-md mx-auto mb-6 text-left">
+                <label for="playerNameInput" class="block font-pixel text-[10px] text-indigo-300 mb-2">
+                    INGRESA TU NOMBRE O APODO:
+                </label>
+                <input 
+                    id="playerNameInput" 
+                    type="text" 
+                    maxlength="22" 
+                    placeholder="Ej. Kevin, Tatiana, Estudiante..." 
+                    class="w-full px-4 py-3 rounded-lg bg-slate-950 border-2 border-indigo-500 text-white font-semibold text-sm focus:outline-none focus:border-amber-400"
+                >
+            </div>
+
+            <button id="btnStartGame" class="pixel-btn pixel-btn-gold w-full sm:w-auto px-8 py-4 font-pixel text-xs sm:text-sm tracking-wide">
+                ▶ INICIAR PARTIDA
+            </button>
+        </main>
+
+        <!-- ==========================================
+             PANTALLA 2: ESCENARIO DE JUEGO PIXEL ART
+             ========================================== -->
+        <main id="screenGame" class="hidden pixel-box p-4 sm:p-6">
+            
+            <!-- ESCENARIO ANIMADO PIXEL ART -->
+            <div class="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden border-4 border-slate-950 bg-slate-950 mb-4 scanlines shadow-inner">
+                <canvas id="stageCanvas" width="320" height="120" class="w-full h-full pixelated"></canvas>
+                
+                <!-- Etiqueta flotante de lugar y hora -->
+                <div class="absolute top-2.5 left-2.5 bg-slate-950/85 border border-indigo-400/60 px-3 py-1 rounded-md flex items-center gap-2">
+                    <span id="scenePlaceBadge" class="font-pixel text-[9px] sm:text-[10px] text-teal-300">📍 AULA 204</span>
+                </div>
+                <div class="absolute top-2.5 right-2.5 bg-slate-950/85 border border-amber-400/60 px-2.5 py-1 rounded-md">
+                    <span id="sceneTimeBadge" class="font-vt text-base sm:text-lg text-amber-300 leading-none">09:50 AM</span>
+                </div>
+            </div>
+
+            <!-- CAJA DE DIÁLOGO ESTILO RPG -->
+            <div id="dialogueBox" class="bg-slate-950 border-3 border-indigo-400 rounded-xl p-4 sm:p-5 mb-5 relative cursor-pointer" title="Haz clic para completar el texto rápido">
+                <div class="flex items-center justify-between mb-2">
+                    <span id="speakerBadge" class="inline-block px-2.5 py-0.5 rounded bg-indigo-600 text-white font-pixel text-[10px] uppercase tracking-wider">
+                        NARRADOR
+                    </span>
+                    <span id="msgCounter" class="font-vt text-base text-slate-400">Mensaje 1/3</span>
+                </div>
+
+                <h3 id="sceneTitleText" class="text-base sm:text-lg font-extrabold text-amber-300 mb-2">
+                    Título de la situación
+                </h3>
+
+                <!-- Contenedor de burbujas/mensajes de la escena -->
+                <div id="narrativeFeed" class="space-y-2.5 text-sm sm:text-[15px] text-slate-100 leading-relaxed min-h-[110px]">
+                    <!-- Inyectado con efecto máquina de escribir -->
+                </div>
+
+                <div class="flex justify-end items-center mt-2">
+                    <button id="btnSkipText" class="text-xs text-indigo-300 hover:text-amber-300 font-semibold flex items-center gap-1">
+                        <span>Mostrar todo rápido</span>
+                        <span class="rpg-cursor">▼</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- OPCIONES DE DECISIÓN (FORJANDO LA RAMA) -->
+            <div id="choicesWrapper">
+                <div class="flex items-center justify-between mb-3">
+                    <p class="font-pixel text-[10px] sm:text-xs text-amber-300 uppercase">
+                        ⚡ ¿QUÉ HACES EN ESTE MOMENTO? (ELIGE UNA RAMA)
+                    </p>
+                </div>
+                <div id="choicesGrid" class="space-y-3">
+                    <!-- Botones de opciones inyectados por JS -->
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ==========================================
+             PANTALLA 3: FINAL, REGALO Y ÁRBOL COMPLETO
+             ========================================== -->
+        <main id="screenEnd" class="hidden space-y-5">
+
+            <!-- BLOQUE 1: FELICITACIONES Y EL REGALO MISTERIOSO -->
+            <section class="pixel-box p-5 sm:p-7 text-center">
+                <div class="inline-block px-3 py-1 rounded-full bg-teal-500/20 border border-teal-400 text-teal-300 font-pixel text-[10px] mb-3">
+                    ✨ RUTA COMPLETADA ✨
+                </div>
+                <h2 class="font-pixel text-sm sm:text-lg text-white mb-2 leading-relaxed">
+                    ¡FELICITACIONES, HAS TERMINADO LA RUTA DE LOS DILEMAS!
+                </h2>
+                <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-6">
+                    Tus 3 elecciones cotidianas han formado un camino único en el árbol. Ahora, <strong>presiona el regalo misterioso</strong> para descubrir tu suerte en el aula:
+                </p>
+
+                <!-- CAJA DE REGALO PIXEL ART INTERACTIVA -->
+                <div id="giftContainer" class="py-6 px-4 bg-slate-950/80 border-2 border-dashed border-amber-400/60 rounded-xl max-w-md mx-auto mb-4">
+                    <p class="font-pixel text-[10px] text-amber-300 mb-4 animate-pulse">
+                        👇 HAZ CLIC EN EL REGALO PARA ABRIRLO 👇
+                    </p>
+                    <button id="btnOpenGift" class="group relative inline-flex flex-col items-center justify-center p-3 focus:outline-none">
+                        <canvas id="giftCanvas" width="96" height="96" class="w-28 h-28 sm:w-32 sm:h-32 pixelated gift-shake"></canvas>
+                        <span class="mt-3 pixel-btn pixel-btn-gold px-4 py-2 font-pixel text-[10px]">
+                            🎁 ABRIR REGALO
+                        </span>
+                    </button>
+                </div>
+
+                <!-- RESULTADO DEL REGALO (Oculto hasta hacer clic) -->
+                <div id="giftResultCard" class="hidden p-5 sm:p-6 rounded-xl border-4 max-w-xl mx-auto mb-5 transition-all">
+                    <div id="giftResultEmoji" class="text-4xl sm:text-5xl mb-3"></div>
+                    <h3 id="giftResultTitle" class="font-pixel text-xs sm:text-base text-white mb-3 leading-relaxed"></h3>
+                    <p id="giftResultDesc" class="text-sm sm:text-base text-slate-200 leading-relaxed mb-4"></p>
+                    
+                    <button id="btnSilenceAlarm" class="hidden pixel-btn bg-rose-600 hover:bg-rose-500 border-rose-300 px-5 py-2.5 font-pixel text-[10px] text-white">
+                        🔇 DETENER MELODÍA / ALARMA
+                    </button>
+                </div>
+
+                <!-- BOTONES PRINCIPALES POST-REGALO -->
+                <div id="postGiftButtons" class="hidden flex-wrap items-center justify-center gap-3 mt-4">
+                    <button id="btnShowMyDecision" class="pixel-btn pixel-btn-gold px-5 py-3 font-pixel text-[10px] sm:text-xs">
+                        🌳 VER "MI DECISIÓN" Y EL ÁRBOL FORMADO
+                    </button>
+                    <button id="btnPlayAgain" class="pixel-btn px-5 py-3 font-pixel text-[10px] sm:text-xs text-slate-200">
+                        🔄 PROBAR OTRA RUTA
+                    </button>
+                </div>
+            </section>
+
+            <!-- BLOQUE 2: APARTADO "MI DECISIÓN" + ÁRBOL DE DECISIONES VISUAL -->
+            <section id="sectionMyDecision" class="hidden pixel-box p-5 sm:p-7">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b-2 border-indigo-500/40 pb-4 mb-5">
+                    <div>
+                        <span class="font-pixel text-[10px] text-teal-300 block mb-1">REGISTRO PERSONAL DEL JUGADOR</span>
+                        <h3 class="font-pixel text-sm sm:text-base text-amber-300">
+                            📋 APARTADO: "MI DECISIÓN" Y ÁRBOL DE RUTAS
+                        </h3>
+                    </div>
+                    <span id="playerBadgeName" class="px-3 py-1 rounded bg-indigo-950 border border-indigo-400 font-vt text-lg text-indigo-200">
+                        Jugador: Estudiante
+                    </span>
+                </div>
+
+                <!-- VISUALIZADOR DEL ÁRBOL DE DECISIONES (SVG + PIXEL ART) -->
+                <div class="bg-slate-950 border-3 border-indigo-500/60 rounded-xl p-4 mb-6">
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div>
+                            <h4 class="font-pixel text-xs text-white">🌳 EL ÁRBOL QUE FORMASTE CON TUS ELECCIONES</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                Las ramas iluminadas muestran el camino exacto que recorriste hoy. Haz clic en cualquier nodo iluminado para ver el detalle.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-3 text-[11px] font-semibold">
+                            <span class="flex items-center gap-1 text-rose-300"><span class="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span> Preconvencional</span>
+                            <span class="flex items-center gap-1 text-amber-300"><span class="w-2.5 h-2.5 rounded-full bg-amber-400 inline-block"></span> Convencional</span>
+                            <span class="flex items-center gap-1 text-emerald-300"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span> Posconvencional</span>
+                        </div>
+                    </div>
+
+                    <!-- Lienzo SVG del Árbol Ramificado -->
+                    <div class="w-full overflow-x-auto">
+                        <svg id="decisionTreeSvg" viewBox="0 0 700 320" class="w-full h-auto min-w-[520px] bg-slate-900/70 rounded-lg border border-slate-800"></svg>
+                    </div>
+                </div>
+
+                <!-- DIAGNÓSTICO GLOBAL DE KOHLBERG Y AUTONOMÍA -->
+                <div id="globalKohlbergBox" class="p-4 sm:p-5 rounded-xl bg-indigo-950/70 border-2 border-indigo-400 mb-6">
+                    <!-- Inyectado dinámicamente -->
+                </div>
+
+                <!-- PASO A PASO DE LAS 3 DECISIONES TOMADAS -->
+                <h4 class="font-pixel text-xs text-amber-300 mb-3">
+                    🕹️ RESUMEN PASO A PASO PARA JUSTIFICAR TU RUTA EN CLASE:
+                </h4>
+                <div id="decisionsCardsList" class="space-y-4 mb-6">
+                    <!-- Tarjetas con cada decisión y su estadio de Kohlberg -->
+                </div>
+
+                <!-- PREGUNTAS GUÍA PARA EL ESTUDIANTE FAVORECIDO (SECCIÓN 2.4.2 DEL INFORME) -->
+                <div class="p-4 sm:p-5 rounded-xl bg-amber-500/10 border-2 border-amber-400/50">
+                    <h4 class="font-pixel text-[11px] text-amber-300 mb-2">
+                        🎤 GUÍA RÁPIDA SI SALISTE FAVORECIDO PARA EXPLICAR (APARTADO 2.4.2):
+                    </h4>
+                    <p class="text-xs sm:text-sm text-slate-200 mb-2">
+                        Recuerda que según <strong>Kohlberg (1984)</strong>, el nivel moral no se mide solo por qué opción elegiste, sino por <strong>las razones</strong> que te llevaron a decidir eso:
+                    </p>
+                    <ul class="list-disc list-inside text-xs sm:text-sm text-slate-300 space-y-1">
+                        <li><strong>¿Por qué elegiste esa ruta?</strong> ¿Qué sentiste en ese escenario cotidiano?</li>
+                        <li><strong>¿Qué priorizaste?</strong> ¿Evitar un problema personal (Preconvencional), no quedar mal con tu grupo de amigos (Convencional) o actuar según tus propios principios de justicia y empatía (Posconvencional)?</li>
+                        <li><strong>Vínculo con la Autonomía Emocional:</strong> ¿Lograste decidir por criterio propio o pesó más la presión del grupo?</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+
+    </div>
+
+    <!-- ==========================================
+         LÓGICA DEL JUEGO, AUDIO 8-BIT Y PIXEL ART
+         ========================================== -->
+    <script>
+        /* ==========================================================
+           1. BASE DE DATOS DE DILEMAS COTIDIANOS UNIVERSITARIOS
+           ========================================================== */
+        const STORY_TREE = {
+            "nodo_1": {
+                step: 1,
+                actLabel: "ACTO 1 DE 3 · 09:45 AM (ENTREGA DEL PROYECTO)",
+                place: "📍 AULA 204 · 15 MINUTOS ANTES DEL CIERRE",
+                time: "09:45 AM",
+                sceneType: "classroom_sticker",
+                title: "La Fiesta de Camila y el Trabajo de Mateo",
+                messages: [
+                    {
+                        speaker: "SITUACIÓN",
+                        badgeColor: "bg-indigo-600",
+                        text: "Faltan 15 minutos para subir el proyecto final. Camila (tu mejor amiga) no hizo nada porque anoche se fue de fiesta y se quedó dormida. En cambio, Mateo (un compañero que te cae mal) te envía su parte casi a última hora porque tuvo problemas en su trabajo."
+                    },
+                    {
+                        speaker: "LA PROPUESTA DE CAMILA",
+                        badgeColor: "bg-amber-600",
+                        text: "Camila te dice en voz baja: «¡Sálvame! Como Mateo te cae mal y envió tarde, ponle mi nombre a la parte que él hizo y sácalo de la portada. Le decimos al profe que Mateo no cumplió a tiempo; así el proyecto queda completo y la culpa le cae solo a él.»"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "1A",
+                        letter: "A",
+                        shortLabel: "Robarle la parte a Mateo y sacarlo",
+                        text: "Hacer lo que dice Camila: ponerle el nombre de ella a la parte de Mateo y borrarlo del grupo. Así aseguras el proyecto completo sin esforzarte más y perjudicas a alguien que igual te cae mal.",
+                        nextNode: "nodo_2A",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 2: Conveniencia e interés propio",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Actúas por conveniencia rápida y antipatía personal, sin importar el robo del esfuerzo ajeno ni el daño a Mateo (Kohlberg, 1984)."
+                    },
+                    {
+                        id: "1B",
+                        letter: "B",
+                        shortLabel: "Dejar a Mateo pero regalarle nota a Camila",
+                        text: "No borrar a Mateo, pero poner también a Camila en la portada como si hubiera trabajado igual que todos, porque 'a la mejor amiga siempre se la cubre aunque no haga nada'.",
+                        nextNode: "nodo_2B",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Lealtad ciega a la amistad",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Priorizas quedar bien con tu mejor amiga y mantener su aprobación por encima de la honestidad académica (Barra-Almagiá, 1987)."
+                    },
+                    {
+                        id: "1C",
+                        letter: "C",
+                        shortLabel: "Ser justo con Mateo y no cubrir a Camila",
+                        text: "Negarte a la trampa: aunque Mateo te caiga mal, él sí trabajó y merece su nota. Subes el proyecto solo con tu nombre y el de Mateo, y le dices a Camila que asuma su responsabilidad.",
+                        nextNode: "nodo_2C",
+                        kohlberg: "Nivel Posconvencional",
+                        stage: "Estadio 5/6: Justicia imparcial y autonomía",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Separas tus gustos personales de lo que es justo: respetas el trabajo de Mateo y no cedes a la presión de tu amiga (Kohlberg, 1984; Nieto-Martínez, 2020)."
+                    }
+                ]
+            },
+
+            /* ==========================================
+               ACTO 2: RAMIFICACIONES SEGÚN EL ACTO 1
+               ========================================== */
+            "nodo_2A": {
+                step: 2,
+                actLabel: "ACTO 2 DE 3 · 11:00 AM (RECLAMO EN PLENA CLASE)",
+                place: "📍 FRENTE AL PROYECTOR DEL SALÓN",
+                time: "11:00 AM",
+                sceneType: "prof_desk",
+                title: "Mateo Reconoce su Trabajo en la Pantalla",
+                messages: [
+                    {
+                        speaker: "EN CLASE",
+                        badgeColor: "bg-rose-600",
+                        text: "El profesor proyecta tu trabajo y felicita a Camila por la sección que supuestamente hizo ella. Mateo lee la pantalla, reconoce sus propias palabras y se levanta indignado con su celular en la mano."
+                    },
+                    {
+                        speaker: "EL PROBLEMA",
+                        badgeColor: "bg-indigo-600",
+                        text: "Mateo le muestra al profe el chat donde te envió ese archivo a las 09:40 AM y cómo lo sacaron del grupo. El profesor se enoja muchísimo: «Esto es robo intelectual. ¿Quién decidió quitarle su trabajo a Mateo?»"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "2A_1",
+                        letter: "A",
+                        shortLabel: "Echarle toda la culpa a Camila",
+                        text: "Decir que fue idea exclusiva de Camila y que ella te obligó a subirlo así, con tal de que el profesor no te ponga cero a ti.",
+                        nextNode: "nodo_3A",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 1: Miedo al castigo propio",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Tu única motivación es salvarte de la sanción del docente, traicionando incluso a tu amiga por temor al castigo (Piaget, 1932)."
+                    },
+                    {
+                        id: "2A_2",
+                        letter: "B",
+                        shortLabel: "Mentir juntos contra Mateo",
+                        text: "Apoyar a Camila inventando frente al curso que Mateo les copió el archivo a ustedes, para defender a tu amiga hasta el final.",
+                        nextNode: "nodo_3A",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Ceguera grupal por lealtad",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Sostienes una mentira grave solo por lealtad mal entendida hacia tu amiga cercana."
+                    },
+                    {
+                        id: "2A_3",
+                        letter: "C",
+                        shortLabel: "Reconocer la falta y pedir disculpas",
+                        text: "Admitir la verdad frente al profesor: reconocer que la parte es de Mateo, pedirle disculpas frente al salón y aceptar la sanción por haberlo excluido.",
+                        nextNode: "nodo_3B",
+                        kohlberg: "Nivel Posconvencional",
+                        stage: "Estadio 5: Asumir consecuencias y reparar",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Dejas las excusas, asumes la responsabilidad ética de tus actos y restituyes el derecho de Mateo (Kohlberg, 1984)."
+                    }
+                ]
+            },
+
+            "nodo_2B": {
+                step: 2,
+                actLabel: "ACTO 2 DE 3 · 11:15 AM (PREGUNTAS DEL PROFE)",
+                place: "📍 DEFENSA ORAL DEL PROYECTO",
+                time: "11:15 AM",
+                sceneType: "exam_phone",
+                title: "Camila no Sabe Qué Responder",
+                messages: [
+                    {
+                        speaker: "LA DEFENSA",
+                        badgeColor: "bg-amber-600",
+                        text: "Dejaste a los tres en la portada para salvar a Camila. Pero el profesor decide calificar con una pregunta al azar... y le pide a Camila que explique justamente la parte que hizo Mateo."
+                    },
+                    {
+                        speaker: "TENSIÓN EN EL GRUPO",
+                        badgeColor: "bg-rose-600",
+                        text: "Camila no sabe qué decir y se queda callada. El profe dice: «Como el grupo no domina su tema, todos tienen 4/10.» Mateo te mira furioso porque él sí trabajó pese a su empleo y va a reprobar por culpa de Camila."
+                    }
+                ],
+                choices: [
+                    {
+                        id: "2B_1",
+                        letter: "A",
+                        shortLabel: "Exigir que te salven solo tu nota",
+                        text: "Reclamarle al profe que te evalúe solo tus hojas porque tú no quieres perder puntos por culpa de los otros dos.",
+                        nextNode: "nodo_3A",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 2: Sálvese quien pueda",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Buscas únicamente asegurar tu calificación individual desentendiéndote del problema que causaste al cubrir a Camila."
+                    },
+                    {
+                        id: "2B_2",
+                        letter: "B",
+                        shortLabel: "Callar para no delatar a Camila",
+                        text: "Quedarte callado y aceptar que a Mateo también le pongan 4/10 injustamente, con tal de no decir frente al curso que Camila no hizo nada.",
+                        nextNode: "nodo_3A",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Evitar quedar mal con la amiga",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Prefieres que un compañero inocente salga perjudicado antes que pasar la vergüenza de decir la verdad sobre tu amiga (Papalia et al., 2009)."
+                    },
+                    {
+                        id: "2B_3",
+                        letter: "C",
+                        shortLabel: "Hablar con la verdad y defender a Mateo",
+                        text: "Hablar con honestidad ante el profe: explicar que Mateo y tú hicieron todo el trabajo y que fue tu error anotar a Camila por amistad, pidiendo que no le bajen la nota a Mateo.",
+                        nextNode: "nodo_3B",
+                        kohlberg: "Nivel Posconvencional",
+                        stage: "Estadio 6: Justicia por encima del favoritismo",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Reconoces que fue injusto perjudicar a Mateo y actúas con honestidad aunque te cueste un reclamo de tu amiga (Kohlberg, 1984)."
+                    }
+                ]
+            },
+
+            "nodo_2C": {
+                step: 2,
+                actLabel: "ACTO 2 DE 3 · 12:30 PM (RECLAMO DE TUS AMIGOS)",
+                place: "📍 PASILLO DE LA FACULTAD",
+                time: "12:30 PM",
+                sceneType: "hallway_wallet",
+                title: "Tu Grupo de Amigos te Reclama en el Pasillo",
+                messages: [
+                    {
+                        speaker: "EL ENOJO DE CAMILA",
+                        badgeColor: "bg-emerald-600",
+                        text: "Tú y Mateo sacaron 10/10, mientras Camila se quedó sin nota por no haber hecho su parte. Dolida, Camila fue a contarle a tu grupo de amigos que 'la traicionaste por preferir a Mateo, que ni siquiera te cae bien'."
+                    },
+                    {
+                        speaker: "PRESIÓN DEL GRUPO",
+                        badgeColor: "bg-indigo-600",
+                        text: "En el receso, tus amigos te rodean: «Te pasaste, a la mejor amiga se la cubre aunque se haya ido de fiesta. Ve ahorita donde el profe a decirle que te olvidaste de poner el nombre de Camila, o no cuentes más con nosotros.»"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "2C_1",
+                        letter: "A",
+                        shortLabel: "Pelear e insultar a todos",
+                        text: "Gritarles que no necesitas a nadie y amenazarlos con contarle al profesor las trampas que ellos han hecho en otras materias.",
+                        nextNode: "nodo_3A",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 2: Reacción impulsiva y amenaza",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Pierdes la autorregulación emocional y respondes mediante ataques y amenazas (Papalia et al., 2009)."
+                    },
+                    {
+                        id: "2C_2",
+                        letter: "B",
+                        shortLabel: "Ceder y mentir al profe por miedo",
+                        text: "Ir donde el profesor a mentir diciendo que se te olvidó poner a Camila en la portada, solo por miedo a quedarte sin amigos en el semestre.",
+                        nextNode: "nodo_3B",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Sumisión a la presión del grupo",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Abandonas tu decisión justa porque pesa más la necesidad de aprobación y el miedo al rechazo social."
+                    },
+                    {
+                        id: "2C_3",
+                        letter: "C",
+                        shortLabel: "Mantenerte firme con calma y criterio",
+                        text: "Responderles con tranquilidad que eres amigo de Camila, pero que la amistad no significa robarle el trabajo a Mateo ni mentir por alguien que se fue de fiesta.",
+                        nextNode: "nodo_3C",
+                        kohlberg: "Nivel Posconvencional",
+                        stage: "Estadio 6: Autonomía emocional y moral firme",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Demuestras verdadera autonomía emocional: sostienes tus valores frente a la presión grupal sin caer en agresiones (Steinberg & Silverberg, 1986; Turiel, 1983)."
+                    }
+                ]
+            },
+
+            /* ==========================================
+               ACTO 3: CIERRE DEL DÍA Y CONVIVENCIA
+               ========================================== */
+            "nodo_3A": {
+                step: 3,
+                actLabel: "ACTO 3 DE 3 · 14:00 PM (TENSIÓN EN EL CURSO)",
+                place: "📍 AULA DE CLASES · CIERRE DEL DÍA",
+                time: "14:00 PM",
+                sceneType: "assembly_debate",
+                title: "El Salón Dividido por el Problema del Proyecto",
+                messages: [
+                    {
+                        speaker: "EL AMBIENTE",
+                        badgeColor: "bg-rose-600",
+                        text: "Todo el curso se enteró de lo que pasó entre tú, Camila y Mateo. Hay discusiones sobre si en los grupos se debe tapar a los amigos o calificar lo justo."
+                    },
+                    {
+                        speaker: "EL PROFESOR",
+                        badgeColor: "bg-indigo-600",
+                        text: "«Antes de terminar la clase, quiero escucharlos: ¿qué regla o acuerdo vamos a tomar como curso para los próximos trabajos en grupo?»"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "3A_1",
+                        letter: "A",
+                        shortLabel: "Vigilancia estricta y castigos duros",
+                        text: "Pedir que el profesor vigile cada archivo con historial y ponga 0 directo a todo el grupo al primer reclamo, para que trabajen por miedo.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 1: Obediencia por miedo al castigo",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Propones que las normas funcionen solo por temor al castigo y vigilancia externa (Piaget, 1932; Turiel, 1983)."
+                    },
+                    {
+                        id: "3A_2",
+                        letter: "B",
+                        shortLabel: "Que cada quien haga grupo con sus amigos",
+                        text: "Proponer que los grupos sean solo entre mejores amigos para que entre ellos se tapen sus faltas y no haya quejas con el docente.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Favoritismo grupal y apariencias",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Buscas evitar conflictos mediante el encubrimiento entre amigos en lugar de fomentar la responsabilidad."
+                    },
+                    {
+                        id: "3A_3",
+                        letter: "C",
+                        shortLabel: "Evaluar con justicia sin importar simpatías",
+                        text: "Proponer un acuerdo honesto: valorar el esfuerzo real de cada compañero aunque no sea nuestro amigo, y asumir con madurez cuando uno no cumple.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Posconvencional",
+                        stage: "Estadio 5: Convivencia justa y democrática",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Promueves una convivencia escolar basada en principios de equidad y responsabilidad propia (Lickona, 1991; Nucci, 2001)."
+                    }
+                ]
+            },
+
+            "nodo_3B": {
+                step: 3,
+                actLabel: "ACTO 3 DE 3 · 14:00 PM (CONVERSACIÓN FINAL)",
+                place: "📍 PATIO DE LA FACULTAD",
+                time: "14:00 PM",
+                sceneType: "campus_bench",
+                title: "Aclarando las Cosas con Camila y Mateo",
+                messages: [
+                    {
+                        speaker: "AL SALIR DE CLASE",
+                        badgeColor: "bg-amber-600",
+                        text: "El profesor respetó el 10/10 de Mateo y le dio a Camila la opción de entregar un trabajo individual sobre 7/10 para no reprobar."
+                    },
+                    {
+                        speaker: "CAMILA",
+                        badgeColor: "bg-teal-600",
+                        text: "Camila se acerca más calmada: «Tenías razón, estuvo mal pedirte que le robemos la parte a Mateo porque yo me fui de fiesta. ¿Cómo quedamos como amigos después de esto?»"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "3B_1",
+                        letter: "A",
+                        shortLabel: "Cortar toda amistad y aislarte",
+                        text: "Decirle que ya no confías en nadie y que desde hoy harás todos los trabajos solo para que nadie te vuelva a meter en problemas.",
+                        nextNode: "FIN",
+                        kohlberg: "Desapego / Autosuficiencia Defensiva",
+                        stage: "Preconvencional / Aislamiento emocional",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Confundes autonomía con desapego emocional ('no necesitar a nadie') aislándote por miedo al conflicto (Ryan & Lynch, 1989)."
+                    },
+                    {
+                        id: "3B_2",
+                        letter: "B",
+                        shortLabel: "Prometerle cubrirla la próxima vez",
+                        text: "Decirle que para que el grupo de amigos no se enoje contigo, en el próximo deber sí le harás su parte cuando salga de fiesta.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 3: Complacer para no perder al grupo",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Cedes tu autonomía emocional por temor a perder la aprobación de tus amigos."
+                    },
+                    {
+                        id: "3B_3",
+                        letter: "C",
+                        shortLabel: "Amistad sincera con responsabilidad",
+                        text: "Decirle que siguen siendo grandes amigos y puedes ayudarla a estudiar para su trabajo de recuperación, pero sin hacer trampas ni perjudicar a otros.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Posconvencional + Autonomía Emocional",
+                        stage: "Estadio 6: Apoyo mutuo con valores propios",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Mantienes el vínculo de afecto y apoyo (base segura secundaria) sin renunciar a tus principios éticos (Oliva Delgado, 2004; Gilligan, 1982)."
+                    }
+                ]
+            },
+
+            "nodo_3C": {
+                step: 3,
+                actLabel: "ACTO 3 DE 3 · 14:00 PM (EL RECONOCIMIENTO)",
+                place: "📍 CAFETERÍA DE LA UNIVERSIDAD",
+                time: "14:00 PM",
+                sceneType: "campus_bench",
+                title: "El Respeto se Gana con Coherencia",
+                messages: [
+                    {
+                        speaker: "EL GIRO DEL DÍA",
+                        badgeColor: "bg-emerald-600",
+                        text: "Mateo se acerca a agradecerte: «Sé que no nos llevamos bien, pero gracias por no dejar que me quitaran mi trabajo; en serio necesitaba esa nota.» Minutos después, Camila también llega y reconoce frente al grupo que ella fue quien falló por irse de fiesta."
+                    },
+                    {
+                        speaker: "TUS AMIGOS",
+                        badgeColor: "bg-indigo-600",
+                        text: "Tus amigos te dicen que admiraron tu firmeza para no dejarte manipular. ¿Qué reflexión les compartes para cerrar?"
+                    }
+                ],
+                choices: [
+                    {
+                        id: "3C_1",
+                        letter: "A",
+                        shortLabel: "Sacarles en cara que tenías razón",
+                        text: "Burlar de ellos diciéndoles que ahora te deben invitar el almuerzo toda la semana si quieren que les vuelvas a hablar.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Preconvencional",
+                        stage: "Estadio 2: Sacar ventaja personal",
+                        colorHex: "#f43f5e",
+                        tagClass: "bg-rose-500/20 text-rose-300 border-rose-500/50",
+                        theory: "Conviertes una acción justa en una oportunidad para cobrar favores o sentirte superior."
+                    },
+                    {
+                        id: "3C_2",
+                        letter: "B",
+                        shortLabel: "Decir que solo seguiste el reglamento",
+                        text: "Decirles que únicamente lo hiciste porque el reglamento de la universidad prohíbe el plagio y no querías sanciones.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Convencional",
+                        stage: "Estadio 4: Cumplimiento estricto de la norma",
+                        colorHex: "#fbbf24",
+                        tagClass: "bg-amber-500/20 text-amber-300 border-amber-500/50",
+                        theory: "Justificas tu acción únicamente por apego a las reglas escritas de la institución."
+                    },
+                    {
+                        id: "3C_3",
+                        letter: "C",
+                        shortLabel: "Ser justo incluso con quien no te cae bien",
+                        text: "Compartir que la verdadera madurez se demuestra siendo justo incluso con quien no te agrada, y sabiendo decir 'no' a los amigos cuando piden algo incorrecto.",
+                        nextNode: "FIN",
+                        kohlberg: "Nivel Posconvencional Integrado",
+                        stage: "Estadio 6: Principios éticos universales y autonomía",
+                        colorHex: "#10b981",
+                        tagClass: "bg-emerald-500/20 text-emerald-300 border-emerald-500/50",
+                        theory: "Alcanzas el nivel más alto de autonomía emocional y moral: actúas por convicción interna de justicia por encima de simpatías o presiones grupales (Kohlberg, 1984; Steinberg & Silverberg, 1986)."
+                    }
+                ]
+            }
+        };
+
+        /* ==========================================================
+           2. SINTETIZADOR DE SONIDO 8-BIT CHIPTUNE (WEB AUDIO API)
+           ========================================================== */
+        class ChiptuneAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+                this.alarmLoop = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === "suspended") {
+                    this.ctx.resume();
+                }
+            }
+
+            playTone(freq, type = "square", duration = 0.08, delay = 0, vol = 0.14) {
+                if (this.muted) return;
+                this.init();
+                const start = this.ctx.currentTime + delay;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, start);
+                gain.gain.setValueAtTime(vol, start);
+                gain.gain.exponentialRampToValueAtTime(0.001, start + duration);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(start);
+                osc.stop(start + duration + 0.01);
+            }
+
+            // Sonido de letra estilo diálogo RPG
+            playTypeBlip() {
+                if (this.muted) return;
+                const freqs = [420, 460, 500, 380];
+                const f = freqs[Math.floor(Math.random() * freqs.length)];
+                this.playTone(f, "square", 0.025, 0, 0.04);
+            }
+
+            // Sonido al elegir una rama/decisión
+            playSelectBranch() {
+                this.playTone(523.25, "square", 0.07, 0, 0.15);
+                this.playTone(659.25, "square", 0.09, 0.06, 0.15);
+                this.playTone(783.99, "square", 0.12, 0.12, 0.15);
+            }
+
+            // Sonido cuando sale "¡Tienes suerte!"
+            playLuckyFanfare() {
+                const notes = [
+                    { f: 523.25, d: 0.1, t: 0 },
+                    { f: 659.25, d: 0.1, t: 0.1 },
+                    { f: 783.99, d: 0.1, t: 0.2 },
+                    { f: 1046.50, d: 0.35, t: 0.3 }
+                ];
+                notes.forEach(n => this.playTone(n.f, "triangle", n.d, n.t, 0.22));
+            }
+
+            // Melodía/Alarma 8-bit cuando sale "¡Fuiste favorecido para explicar!"
+            playChosenSirenMelody() {
+                this.stopAlarm();
+                if (this.muted) return;
+                this.init();
+
+                const runMelody = () => {
+                    if (this.muted) return;
+                    const seq = [
+                        { f: 587.33, d: 0.14, t: 0.00 }, // Re
+                        { f: 880.00, d: 0.14, t: 0.15 }, // La
+                        { f: 587.33, d: 0.14, t: 0.30 }, // Re
+                        { f: 880.00, d: 0.14, t: 0.45 }, // La
+                        { f: 659.25, d: 0.12, t: 0.62 }, // Mi
+                        { f: 783.99, d: 0.12, t: 0.76 }, // Sol
+                        { f: 1046.50, d: 0.38, t: 0.90 } // Do alto
+                    ];
+                    seq.forEach(n => this.playTone(n.f, "sawtooth", n.d, n.t, 0.26));
+                };
+
+                runMelody();
+                let count = 0;
+                this.alarmLoop = setInterval(() => {
+                    count++;
+                    if (count >= 5) {
+                        this.stopAlarm();
+                    } else {
+                        runMelody();
+                    }
+                }, 1500);
+            }
+
+            stopAlarm() {
+                if (this.alarmLoop) {
+                    clearInterval(this.alarmLoop);
+                    this.alarmLoop = null;
+                }
+            }
+        }
+
+        const audioFX = new ChiptuneAudio();
+
+        /* ==========================================================
+           3. MOTOR GRÁFICO PIXEL ART EN CANVAS (PERSONAJES Y ESCENAS)
+           ========================================================== */
+        let animTick = 0;
+        let currentSceneMode = "classroom_sticker";
+
+        // Dibuja un estudiante en Pixel Art (x, y) con colores personalizables y expresión
+        function drawPixelCharacter(ctx, x, y, shirtColor, hairColor, skinColor, emote = "", bounceOffset = 0) {
+            const py = y + bounceOffset;
+            // Sombra en el piso
+            ctx.fillStyle = "rgba(0,0,0,0.35)";
+            ctx.fillRect(x + 2, y + 34, 20, 4);
+
+            // Piernas / Pantalón
+            ctx.fillStyle = "#1e293b";
+            ctx.fillRect(x + 5, py + 24, 6, 10);
+            ctx.fillRect(x + 13, py + 24, 6, 10);
+
+            // Zapatos
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(x + 4, py + 32, 7, 3);
+            ctx.fillRect(x + 13, py + 32, 7, 3);
+
+            // Torso / Camiseta o Chompa universitaria
+            ctx.fillStyle = shirtColor;
+            ctx.fillRect(x + 3, py + 13, 18, 12);
+
+            // Brazos
+            ctx.fillStyle = shirtColor;
+            ctx.fillRect(x + 1, py + 14, 3, 8);
+            ctx.fillRect(x + 20, py + 14, 3, 8);
+            // Manos
+            ctx.fillStyle = skinColor;
+            ctx.fillRect(x + 1, py + 21, 3, 3);
+            ctx.fillRect(x + 20, py + 21, 3, 3);
+
+            // Cabeza
+            ctx.fillStyle = skinColor;
+            ctx.fillRect(x + 4, py + 3, 16, 11);
+
+            // Cabello
+            ctx.fillStyle = hairColor;
+            ctx.fillRect(x + 3, py + 1, 18, 4);
+            ctx.fillRect(x + 3, py + 3, 3, 5);
+            ctx.fillRect(x + 18, py + 3, 3, 5);
+
+            // Ojos (parpadean cada cierto tiempo)
+            const isBlinking = (animTick % 90) > 85;
+            ctx.fillStyle = "#0f172a";
+            if (isBlinking) {
+                ctx.fillRect(x + 7, py + 8, 3, 1);
+                ctx.fillRect(x + 14, py + 8, 3, 1);
+            } else {
+                ctx.fillRect(x + 8, py + 7, 2, 3);
+                ctx.fillRect(x + 15, py + 7, 2, 3);
+            }
+
+            // Globo de emoción pixelado sobre la cabeza
+            if (emote) {
+                const floatY = py - 12 + Math.sin(animTick * 0.12) * 2;
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(x + 4, floatY, 16, 10);
+                ctx.fillStyle = "#0f172a";
+                ctx.strokeRect(x + 4, floatY, 16, 10);
+
+                if (emote === "!") {
+                    ctx.fillStyle = "#ef4444";
+                    ctx.fillRect(x + 11, floatY + 2, 2, 4);
+                    ctx.fillRect(x + 11, floatY + 7, 2, 2);
+                } else if (emote === "phone") {
+                    ctx.fillStyle = "#0284c7";
+                    ctx.fillRect(x + 9, floatY + 2, 6, 7);
+                    ctx.fillStyle = "#bae6fd";
+                    ctx.fillRect(x + 10, floatY + 3, 4, 4);
+                } else if (emote === "sweat") {
+                    ctx.fillStyle = "#38bdf8";
+                    ctx.fillRect(x + 10, floatY + 3, 4, 5);
+                } else if (emote === "heart") {
+                    ctx.fillStyle = "#10b981";
+                    ctx.fillRect(x + 9, floatY + 3, 6, 5);
+                }
+            }
+        }
+
+        // Renderiza el escenario de Portada (Intro)
+        function renderIntroCanvas() {
+            const canvas = document.getElementById("introCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Cielo nocturno/atardecer universitario
+            ctx.fillStyle = "#1e1b4b";
+            ctx.fillRect(0, 0, 320, 82);
+            // Piso del campus
+            ctx.fillStyle = "#334155";
+            ctx.fillRect(0, 82, 320, 28);
+            ctx.fillStyle = "#475569";
+            for (let i = 0; i < 320; i += 20) {
+                ctx.fillRect(i, 82, 12, 3);
+            }
+
+            // Estrellas pixeladas parpadeando
+            ctx.fillStyle = "#fef08a";
+            const stars = [[30, 18], [85, 12], [150, 24], [220, 15], [285, 22], [190, 38]];
+            stars.forEach(([sx, sy], idx) => {
+                if ((animTick + idx * 15) % 40 < 28) {
+                    ctx.fillRect(sx, sy, 2, 2);
+                }
+            });
+
+            // Árbol Pixel Art central brillando en el campus
+            // Tronco
+            ctx.fillStyle = "#78350f";
+            ctx.fillRect(154, 52, 12, 30);
+            ctx.fillRect(148, 56, 6, 4);
+            ctx.fillRect(166, 54, 6, 4);
+            // Copa del árbol moral (3 colores de Kohlberg)
+            ctx.fillStyle = "#10b981"; // Verde Posconvencional
+            ctx.fillRect(136, 22, 48, 22);
+            ctx.fillStyle = "#059669";
+            ctx.fillRect(130, 32, 60, 16);
+            // Frutos/Nodos brillantes
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillRect(142, 28, 4, 4);
+            ctx.fillStyle = "#f43f5e";
+            ctx.fillRect(172, 36, 4, 4);
+            ctx.fillStyle = "#38bdf8";
+            ctx.fillRect(158, 24, 4, 4);
+
+            // Los 3 personajes universitarios alrededor del árbol
+            const b1 = Math.floor(Math.sin(animTick * 0.1) * 1.5);
+            const b2 = Math.floor(Math.cos(animTick * 0.1) * 1.5);
+            drawPixelCharacter(ctx, 68, 52, "#6366f1", "#1e293b", "#fbcfe8", "heart", b1);  // Jugador
+            drawPixelCharacter(ctx, 102, 54, "#f59e0b", "#451a03", "#fed7aa", "phone", b2); // Sebas
+            drawPixelCharacter(ctx, 212, 53, "#0d9488", "#0f172a", "#fde68a", "!", b1);     // Dani
+        }
+
+        // Renderiza el escenario principal durante las decisiones
+        function renderStageCanvas() {
+            const canvas = document.getElementById("stageCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Fondo pared del aula / pasillo
+            ctx.fillStyle = "#1e293b";
+            ctx.fillRect(0, 0, 320, 86);
+            // Piso de baldosa universitaria
+            ctx.fillStyle = "#334155";
+            ctx.fillRect(0, 86, 320, 34);
+            ctx.fillStyle = "#475569";
+            for (let i = 0; i < 320; i += 24) {
+                ctx.fillRect(i, 86, 16, 3);
+            }
+
+            // Pizarra / Proyector al fondo
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(85, 14, 150, 48);
+            ctx.fillStyle = "#0f766e";
+            ctx.fillRect(89, 18, 142, 40);
+
+            // Texto/Gráficos simulados en el proyector
+            ctx.fillStyle = "#99f6e4";
+            ctx.fillRect(98, 25, 65, 4);
+            ctx.fillRect(98, 33, 95, 3);
+            ctx.fillRect(98, 40, 80, 3);
+            ctx.fillStyle = "#fbbf24";
+            ctx.fillRect(195, 25, 24, 22);
+
+            const b1 = Math.floor(Math.sin(animTick * 0.12) * 1.5);
+            const b2 = Math.floor(Math.cos(animTick * 0.12) * 1.5);
+
+            if (currentSceneMode === "classroom_sticker") {
+                // Dani exponiendo al frente nervioso, Sebas con celular y Jugador decidiendo
+                drawPixelCharacter(ctx, 150, 52, "#0d9488", "#0f172a", "#fde68a", "sweat", b1); // Dani al frente
+                drawPixelCharacter(ctx, 52, 60, "#f59e0b", "#451a03", "#fed7aa", "phone", b2);  // Sebas con sticker
+                drawPixelCharacter(ctx, 238, 60, "#6366f1", "#1e293b", "#fbcfe8", "!", b1);     // Tú (Jugador)
+            } else if (currentSceneMode === "prof_desk" || currentSceneMode === "exam_phone") {
+                // Docente + Estudiantes en tensión
+                drawPixelCharacter(ctx, 150, 50, "#be123c", "#334155", "#fed7aa", "!", 0);      // Docente
+                drawPixelCharacter(ctx, 64, 60, "#f59e0b", "#451a03", "#fed7aa", "sweat", b2);  // Sebas
+                drawPixelCharacter(ctx, 105, 62, "#6366f1", "#1e293b", "#fbcfe8", "heart", b1); // Tú
+                drawPixelCharacter(ctx, 228, 60, "#0d9488", "#0f172a", "#fde68a", "phone", b2); // Dani
+            } else if (currentSceneMode === "hallway_wallet") {
+                // Billetera brillando en el suelo
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillRect(156, 88, 12, 8);
+                ctx.fillStyle = "#78350f";
+                ctx.fillRect(157, 89, 10, 6);
+                drawPixelCharacter(ctx, 112, 58, "#6366f1", "#1e293b", "#fbcfe8", "!", b1);     // Tú viendo la billetera
+                drawPixelCharacter(ctx, 235, 58, "#f59e0b", "#451a03", "#fed7aa", "phone", b2); // Grupo a lo lejos
+            } else {
+                // Cierre grupal / Patio
+                drawPixelCharacter(ctx, 85, 58, "#f59e0b", "#451a03", "#fed7aa", "heart", b2);
+                drawPixelCharacter(ctx, 148, 56, "#6366f1", "#1e293b", "#fbcfe8", "heart", b1);
+                drawPixelCharacter(ctx, 210, 58, "#0d9488", "#0f172a", "#fde68a", "heart", b2);
+            }
+        }
+
+        // Dibuja la Caja de Regalo en Pixel Art (Cerrada o Abierta)
+        function drawPixelGiftBox(isOpen = false) {
+            const canvas = document.getElementById("giftCanvas");
+            if (!canvas) return;
+            const ctx = canvas.getContext("2d");
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Sombra base
+            ctx.fillStyle = "rgba(0,0,0,0.4)";
+            ctx.fillRect(16, 80, 64, 8);
+
+            if (!isOpen) {
+                // Caja cerrada roja con cinta dorada
+                ctx.fillStyle = "#e11d48";
+                ctx.fillRect(20, 36, 56, 46);
+                ctx.fillStyle = "#be123c";
+                ctx.fillRect(20, 42, 56, 6);
+
+                // Cinta vertical dorada
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillRect(42, 36, 12, 46);
+                // Cinta horizontal dorada
+                ctx.fillRect(20, 54, 56, 10);
+
+                // Tapa del regalo
+                ctx.fillStyle = "#f43f5e";
+                ctx.fillRect(16, 26, 64, 12);
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillRect(42, 26, 12, 12);
+
+                // Moño superior pixelado
+                ctx.fillStyle = "#f59e0b";
+                ctx.fillRect(30, 14, 12, 12);
+                ctx.fillRect(54, 14, 12, 12);
+                ctx.fillStyle = "#fef08a";
+                ctx.fillRect(42, 18, 12, 8);
+            } else {
+                // Caja abierta con destellos saliendo
+                ctx.fillStyle = "#e11d48";
+                ctx.fillRect(20, 46, 56, 36);
+                ctx.fillStyle = "#fbbf24";
+                ctx.fillRect(42, 46, 12, 36);
+
+                // Destellos mágicos
+                ctx.fillStyle = "#fef08a";
+                ctx.fillRect(26, 16, 6, 6);
+                ctx.fillRect(64, 14, 6, 6);
+                ctx.fillRect(45, 8, 8, 8);
+                ctx.fillStyle = "#2dd4bf";
+                ctx.fillRect(34, 28, 6, 6);
+                ctx.fillRect(56, 26, 6, 6);
+            }
+        }
+
+        // Bucle de animación general a 30 FPS
+        setInterval(() => {
+            animTick++;
+            renderIntroCanvas();
+            renderStageCanvas();
+        }, 50);
+
+        /* ==========================================================
+           4. CONTROLADOR DE LA NOVELA VISUAL Y MÁQUINA DE ESCRIBIR
+           ========================================================== */
+        let currentNodeKey = "nodo_1";
+        let chosenRoute = [];
+        let playerName = "Estudiante";
+        let timerInterval = null;
+        let typingTimer = null;
+        let isTyping = false;
+        let currentFullMessages = [];
+        let giftAlreadyOpened = false;
+
+        // Referencias DOM
+        const screenStart = document.getElementById("screenStart");
+        const screenGame = document.getElementById("screenGame");
+        const screenEnd = document.getElementById("screenEnd");
+        const liveProgressContainer = document.getElementById("liveProgressContainer");
+        const actIndicator = document.getElementById("actIndicator");
+        const timerNumber = document.getElementById("timerNumber");
+        const timerBar = document.getElementById("timerBar");
+        const liveBreadcrumbs = document.getElementById("liveBreadcrumbs");
+        const liveTreeCounter = document.getElementById("liveTreeCounter");
+
+        const scenePlaceBadge = document.getElementById("scenePlaceBadge");
+        const sceneTimeBadge = document.getElementById("sceneTimeBadge");
+        const sceneTitleText = document.getElementById("sceneTitleText");
+        const narrativeFeed = document.getElementById("narrativeFeed");
+        const choicesGrid = document.getElementById("choicesGrid");
+
+        // Botón de Mute
+        document.getElementById("btnMute").addEventListener("click", () => {
+            audioFX.muted = !audioFX.muted;
+            if (audioFX.muted) audioFX.stopAlarm();
+            document.getElementById("muteIcon").textContent = audioFX.muted ? "🔇" : "🔊";
+            document.getElementById("muteText").textContent = audioFX.muted ? "SILENCIADO" : "8-BIT ON";
+        });
+
+        // Iniciar juego
+        document.getElementById("btnStartGame").addEventListener("click", () => {
+            const val = document.getElementById("playerNameInput").value.trim();
+            playerName = val !== "" ? val : "Estudiante UTN";
+            audioFX.playSelectBranch();
+            startNewRun();
+        });
+
+        function startNewRun() {
+            currentNodeKey = "nodo_1";
+            chosenRoute = [];
+            giftAlreadyOpened = false;
+            audioFX.stopAlarm();
+
+            screenStart.classList.add("hidden");
+            screenEnd.classList.add("hidden");
+            screenGame.classList.remove("hidden");
+            liveProgressContainer.classList.remove("hidden");
+
+            updateLiveBreadcrumbs();
+            loadScenarioNode(currentNodeKey);
+        }
+
+        function updateLiveBreadcrumbs() {
+            liveBreadcrumbs.innerHTML = `<span class="px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500 text-indigo-200 font-vt text-base">🌱 Inicio</span>`;
+            chosenRoute.forEach((item, idx) => {
+                liveBreadcrumbs.innerHTML += `
+                    <span class="text-slate-500">➜</span>
+                    <span class="px-2 py-0.5 rounded border font-vt text-base ${item.tagClass}">
+                        Rama ${idx + 1}: ${item.shortLabel}
+                    </span>
+                `;
+            });
+            liveTreeCounter.textContent = `${chosenRoute.length}/3 Ramas`;
+        }
+
+        function loadScenarioNode(nodeKey) {
+            const node = STORY_TREE[nodeKey];
+            if (!node) return;
+
+            currentSceneMode = node.sceneType;
+            actIndicator.textContent = node.actLabel;
+            scenePlaceBadge.textContent = node.place;
+            sceneTimeBadge.textContent = node.time;
+            sceneTitleText.textContent = node.title;
+
+            // Iniciar temporizador visual de 25 segundos
+            startStepTimer(25);
+
+            // Efecto máquina de escribir para los mensajes
+            currentFullMessages = node.messages;
+            typewriteMessages(node.messages);
+
+            // Renderizar las 3 opciones de decisión
+            choicesGrid.innerHTML = "";
+            node.choices.forEach((choice) => {
+                const btn = document.createElement("button");
+                btn.className = "pixel-btn w-full text-left p-3.5 sm:p-4 flex items-start gap-3.5 group";
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-indigo-950 border-2 border-indigo-400 group-hover:border-amber-300 group-hover:bg-amber-400 group-hover:text-slate-950 flex items-center justify-center font-pixel text-xs text-indigo-200 shrink-0 mt-0.5 transition-colors">
+                        ${choice.letter}
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <span class="font-bold text-amber-300 text-xs sm:text-sm uppercase tracking-wide">
+                                🌿 ${choice.shortLabel}
+                            </span>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">
+                            ${choice.text}
+                        </p>
+                    </div>
+                `;
+                btn.addEventListener("click", () => selectChoice(node, choice));
+                choicesGrid.appendChild(btn);
+            });
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function typewriteMessages(messages) {
+            if (typingTimer) clearInterval(typingTimer);
+            narrativeFeed.innerHTML = "";
+            isTyping = true;
+
+            let msgIdx = 0;
+            let charIdx = 0;
+            let currentP = null;
+
+            function createBubble(msg, index) {
+                document.getElementById("msgCounter").textContent = ` Escena ${index + 1}/${messages.length}`;
+                const wrap = document.createElement("div");
+                wrap.className = "p-3 rounded-lg bg-slate-900/90 border border-slate-800";
+                wrap.innerHTML = `
+                    <span class="inline-block px-2 py-0.5 rounded ${msg.badgeColor} text-white font-pixel text-[8px] sm:text-[9px] mb-1">
+                        ${msg.speaker}
+                    </span>
+                    <p class="text-slate-100 text-xs sm:text-sm leading-relaxed"></p>
+                `;
+                narrativeFeed.appendChild(wrap);
+                return wrap.querySelector("p");
+            }
+
+            currentP = createBubble(messages[0], 0);
+
+            typingTimer = setInterval(() => {
+                const currentMsg = messages[msgIdx];
+                if (!currentMsg) {
+                    clearInterval(typingTimer);
+                    isTyping = false;
+                    return;
+                }
+
+                currentP.textContent += currentMsg.text.charAt(charIdx);
+                if (charIdx % 3 === 0) audioFX.playTypeBlip();
+                charIdx++;
+
+                if (charIdx >= currentMsg.text.length) {
+                    msgIdx++;
+                    charIdx = 0;
+                    if (msgIdx < messages.length) {
+                        currentP = createBubble(messages[msgIdx], msgIdx);
+                    } else {
+                        clearInterval(typingTimer);
+                        isTyping = false;
+                    }
+                }
+            }, 14);
+        }
+
+        // Mostrar todo el texto de golpe si hace clic en la caja de diálogo
+        function finishTypingImmediately() {
+            if (!isTyping) return;
+            clearInterval(typingTimer);
+            isTyping = false;
+            narrativeFeed.innerHTML = "";
+            currentFullMessages.forEach((msg, idx) => {
+                document.getElementById("msgCounter").textContent = `Escena ${idx + 1}/${currentFullMessages.length}`;
+                const wrap = document.createElement("div");
+                wrap.className = "p-3 rounded-lg bg-slate-900/90 border border-slate-800";
+                wrap.innerHTML = `
+                    <span class="inline-block px-2 py-0.5 rounded ${msg.badgeColor} text-white font-pixel text-[8px] sm:text-[9px] mb-1">
+                        ${msg.speaker}
+                    </span>
+                    <p class="text-slate-100 text-xs sm:text-sm leading-relaxed">${msg.text}</p>
+                `;
+                narrativeFeed.appendChild(wrap);
+            });
+        }
+
+        document.getElementById("dialogueBox").addEventListener("click", finishTypingImmediately);
+        document.getElementById("btnSkipText").addEventListener("click", (e) => {
+            e.stopPropagation();
+            finishTypingImmediately();
+        });
+
+        function startStepTimer(seconds) {
+            if (timerInterval) clearInterval(timerInterval);
+            let rem = seconds;
+            timerNumber.textContent = `${rem}s`;
+            timerBar.style.width = "100%";
+
+            timerInterval = setInterval(() => {
+                rem--;
+                const pct = Math.max(0, (rem / seconds) * 100);
+                timerBar.style.width = `${pct}%`;
+                timerNumber.textContent = `${Math.max(0, rem)}s`;
+                if (rem <= 0) clearInterval(timerInterval);
+            }, 1000);
+        }
+
+        function selectChoice(node, choice) {
+            audioFX.playSelectBranch();
+            if (typingTimer) clearInterval(typingTimer);
+            if (timerInterval) clearInterval(timerInterval);
+
+            chosenRoute.push({
+                step: node.step,
+                nodeTitle: node.title,
+                place: node.place,
+                id: choice.id,
+                letter: choice.letter,
+                shortLabel: choice.shortLabel,
+                choiceText: choice.text,
+                kohlberg: choice.kohlberg,
+                stage: choice.stage,
+                colorHex: choice.colorHex,
+                tagClass: choice.tagClass,
+                theory: choice.theory
+            });
+
+            updateLiveBreadcrumbs();
+
+            if (choice.nextNode === "FIN") {
+                launchEndScreen();
+            } else {
+                currentNodeKey = choice.nextNode;
+                loadScenarioNode(currentNodeKey);
+            }
+        }
+
+        /* ==========================================================
+           5. PANTALLA FINAL, SORTEO DEL REGALO Y ÁRBOL INTERACTIVO
+           ========================================================== */
+        function launchEndScreen() {
+            screenGame.classList.add("hidden");
+            liveProgressContainer.classList.add("hidden");
+            screenEnd.classList.remove("hidden");
+
+            document.getElementById("playerBadgeName").textContent = `Jugador: ${playerName}`;
+
+            // Preparar caja de regalo cerrada
+            drawPixelGiftBox(false);
+            document.getElementById("giftContainer").classList.remove("hidden");
+            document.getElementById("giftResultCard").classList.add("hidden");
+            document.getElementById("postGiftButtons").classList.add("hidden");
+            document.getElementById("postGiftButtons").classList.remove("flex");
+            document.getElementById("sectionMyDecision").classList.add("hidden");
+            document.getElementById("btnSilenceAlarm").classList.add("hidden");
+
+            renderVisualDecisionTree();
+            renderMyDecisionCards();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        // Abrir el Regalo Misterioso
+        document.getElementById("btnOpenGift").addEventListener("click", () => {
+            if (giftAlreadyOpened) return;
+            giftAlreadyOpened = true;
+
+            drawPixelGiftBox(true);
+            document.getElementById("giftCanvas").classList.remove("gift-shake");
+
+            const giftResultCard = document.getElementById("giftResultCard");
+            const giftResultEmoji = document.getElementById("giftResultEmoji");
+            const giftResultTitle = document.getElementById("giftResultTitle");
+            const giftResultDesc = document.getElementById("giftResultDesc");
+            const btnSilenceAlarm = document.getElementById("btnSilenceAlarm");
+            const postGiftButtons = document.getElementById("postGiftButtons");
+
+            giftResultCard.classList.remove("hidden");
+            postGiftButtons.classList.remove("hidden");
+            postGiftButtons.classList.add("flex");
+
+            // Sorteo: 45% de probabilidad de salir favorecido para explicar su ruta
+            const isFavored = Math.random() < 0.45;
+
+            if (isFavored) {
+                giftResultCard.className = "p-5 sm:p-6 rounded-xl border-4 max-w-xl mx-auto mb-5 transition-all chosen-alert-card";
+                giftResultEmoji.textContent = "🚨🎁🎉";
+                giftResultTitle.textContent = "¡FELICIDADES, FUISTE FAVORECIDO PARA EXPLICAR POR QUÉ ELEGISTE ESA RUTA!";
+                giftResultDesc.innerHTML = `<strong>${playerName}</strong>, la melodía de 8 bits te eligió. Revisa aquí abajo el apartado <strong>"Mi Decisión"</strong> con el árbol que formaste y cuéntanos brevemente qué razones te llevaron a tomar ese camino.`;
+                btnSilenceAlarm.classList.remove("hidden");
+                audioFX.playChosenSirenMelody();
+
+                // Desplegar automáticamente el árbol y sus decisiones para que pueda leerlas fácil
+                document.getElementById("sectionMyDecision").classList.remove("hidden");
+            } else {
+                giftResultCard.className = "p-5 sm:p-6 rounded-xl border-4 border-emerald-400 bg-emerald-950/40 max-w-xl mx-auto mb-5 transition-all";
+                giftResultEmoji.textContent = "🍀😌✨";
+                giftResultTitle.textContent = "¡TIENES SUERTE!";
+                giftResultDesc.innerHTML = `<strong>${playerName}</strong>, te salvaste de que suene la alarma, pero presiona el botón de abajo para explorar el <strong>Árbol de Decisiones</strong> que creaste y tu nivel de Kohlberg.`;
+                audioFX.playLuckyFanfare();
+            }
+        });
+
+        document.getElementById("btnSilenceAlarm").addEventListener("click", () => {
+            audioFX.stopAlarm();
+            document.getElementById("btnSilenceAlarm").classList.add("hidden");
+        });
+
+        document.getElementById("btnShowMyDecision").addEventListener("click", () => {
+            audioFX.playSelectBranch();
+            const sec = document.getElementById("sectionMyDecision");
+            sec.classList.toggle("hidden");
+            if (!sec.classList.contains("hidden")) {
+                sec.scrollIntoView({ behavior: "smooth" });
+            }
+        });
+
+        document.getElementById("btnPlayAgain").addEventListener("click", () => {
+            audioFX.stopAlarm();
+            audioFX.playSelectBranch();
+            startNewRun();
+        });
+
+        /* ==========================================================
+           6. DIBUJO DEL ÁRBOL DE DECISIONES COMPLETO EN SVG
+           ========================================================== */
+        function renderVisualDecisionTree() {
+            const svg = document.getElementById("decisionTreeSvg");
+            if (!svg) return;
+
+            const c1 = chosenRoute[0]; // Acto 1: A, B o C
+            const c2 = chosenRoute[1]; // Acto 2: A, B o C
+            const c3 = chosenRoute[2]; // Acto 3: A, B o C
+
+            // Coordenadas Y de los 3 ejes (A = arriba, B = centro, C = abajo)
+            const yMap = { "A": 65, "B": 160, "C": 255 };
+            const y1 = c1 ? yMap[c1.letter] : 160;
+            const y2 = c2 ? yMap[c2.letter] : 160;
+            const y3 = c3 ? yMap[c3.letter] : 160;
+
+            const xRoot = 65;
+            const xAct1 = 230;
+            const xAct2 = 430;
+            const xAct3 = 625;
+
+            let html = `
+                <!-- Fondo decorativo de tronco y raíces -->
+                <rect x="18" y="142" width="47" height="36" rx="6" fill="#78350f" stroke="#f59e0b" stroke-width="2"/>
+                <text x="41" y="164" fill="#fef08a" font-family="Press Start 2P" font-size="8" text-anchor="middle">RAÍZ</text>
+            `;
+
+            // 1. Dibujar todas las ramas posibles en gris tenue (el árbol completo de posibilidades)
+            const letters = ["A", "B", "C"];
+            letters.forEach(L1 => {
+                const py1 = yMap[L1];
+                html += `<path d="M ${xRoot} 160 C 140 160, 150 ${py1}, ${xAct1} ${py1}" stroke="#334155" stroke-width="3" fill="none" stroke-dasharray="4 4"/>`;
+                letters.forEach(L2 => {
+                    const py2 = yMap[L2];
+                    html += `<path d="M ${xAct1} ${py1} C 320 ${py1}, 340 ${py2}, ${xAct2} ${py2}" stroke="#1e293b" stroke-width="2" fill="none"/>`;
+                    letters.forEach(L3 => {
+                        const py3 = yMap[L3];
+                        html += `<path d="M ${xAct2} ${py2} C 520 ${py2}, 540 ${py3}, ${xAct3} ${py3}" stroke="#1e293b" stroke-width="2" fill="none"/>`;
+                    });
+                });
+            });
+
+            // 2. Dibujar los nodos no seleccionados (hojas apagadas)
+            letters.forEach(L => {
+                const py = yMap[L];
+                html += `
+                    <circle cx="${xAct1}" cy="${py}" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                    <text x="${xAct1}" y="${py + 4}" fill="#64748b" font-family="Press Start 2P" font-size="8" text-anchor="middle">1${L}</text>
+
+                    <circle cx="${xAct2}" cy="${py}" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                    <text x="${xAct2}" y="${py + 4}" fill="#64748b" font-family="Press Start 2P" font-size="8" text-anchor="middle">2${L}</text>
+
+                    <circle cx="${xAct3}" cy="${py}" r="12" fill="#0f172a" stroke="#475569" stroke-width="2"/>
+                    <text x="${xAct3}" y="${py + 4}" fill="#64748b" font-family="Press Start 2P" font-size="8" text-anchor="middle">3${L}</text>
+                `;
+            });
+
+            // 3. Dibujar LA RUTA ELEGIDA POR EL JUGADOR iluminada encima
+            if (c1 && c2 && c3) {
+                html += `
+                    <!-- Rama 1 iluminada -->
+                    <path class="active-branch" d="M ${xRoot} 160 C 140 160, 150 ${y1}, ${xAct1} ${y1}" stroke="${c1.colorHex}" stroke-width="6" fill="none"/>
+                    <!-- Rama 2 iluminada -->
+                    <path class="active-branch" d="M ${xAct1} ${y1} C 320 ${y1}, 340 ${y2}, ${xAct2} ${y2}" stroke="${c2.colorHex}" stroke-width="6" fill="none"/>
+                    <!-- Rama 3 iluminada -->
+                    <path class="active-branch" d="M ${xAct2} ${y2} C 520 ${y2}, 540 ${y3}, ${xAct3} ${y3}" stroke="${c3.colorHex}" stroke-width="6" fill="none"/>
+
+                    <!-- Nodo Acto 1 Activo -->
+                    <circle cx="${xAct1}" cy="${y1}" r="18" fill="${c1.colorHex}" stroke="#ffffff" stroke-width="3"/>
+                    <text x="${xAct1}" y="${y1 + 4}" fill="#0f172a" font-family="Press Start 2P" font-size="9" text-anchor="middle">1${c1.letter}</text>
+                    <rect x="${xAct1 - 70}" y="${y1 - 38}" width="140" height="18" rx="4" fill="#0f172a" stroke="${c1.colorHex}" stroke-width="1.5"/>
+                    <text x="${xAct1}" y="${y1 - 26}" fill="#f8fafc" font-family="Plus Jakarta Sans" font-weight="700" font-size="9" text-anchor="middle">${c1.shortLabel}</text>
+
+                    <!-- Nodo Acto 2 Activo -->
+                    <circle cx="${xAct2}" cy="${y2}" r="18" fill="${c2.colorHex}" stroke="#ffffff" stroke-width="3"/>
+                    <text x="${xAct2}" y="${y2 + 4}" fill="#0f172a" font-family="Press Start 2P" font-size="9" text-anchor="middle">2${c2.letter}</text>
+                    <rect x="${xAct2 - 75}" y="${y2 - 38}" width="150" height="18" rx="4" fill="#0f172a" stroke="${c2.colorHex}" stroke-width="1.5"/>
+                    <text x="${xAct2}" y="${y2 - 26}" fill="#f8fafc" font-family="Plus Jakarta Sans" font-weight="700" font-size="9" text-anchor="middle">${c2.shortLabel}</text>
+
+                    <!-- Nodo Acto 3 Activo -->
+                    <circle cx="${xAct3}" cy="${y3}" r="20" fill="${c3.colorHex}" stroke="#ffffff" stroke-width="3"/>
+                    <text x="${xAct3}" y="${y3 + 4}" fill="#0f172a" font-family="Press Start 2P" font-size="9" text-anchor="middle">3${c3.letter}</text>
+                    <rect x="${xAct3 - 72}" y="${y3 - 40}" width="144" height="18" rx="4" fill="#0f172a" stroke="${c3.colorHex}" stroke-width="1.5"/>
+                    <text x="${xAct3}" y="${y3 - 28}" fill="#f8fafc" font-family="Plus Jakarta Sans" font-weight="700" font-size="9" text-anchor="middle">${c3.shortLabel}</text>
+                `;
+            }
+
+            // Etiquetas inferiores de cada columna del árbol
+            html += `
+                <text x="${xAct1}" y="308" fill="#94a3b8" font-family="Press Start 2P" font-size="8" text-anchor="middle">ACTO 1: EL TRABAJO</text>
+                <text x="${xAct2}" y="308" fill="#94a3b8" font-family="Press Start 2P" font-size="8" text-anchor="middle">ACTO 2: EL RECLAMO</text>
+                <text x="${xAct3}" y="308" fill="#94a3b8" font-family="Press Start 2P" font-size="8" text-anchor="middle">ACTO 3: EL CIERRE</text>
+            `;
+
+            svg.innerHTML = html;
+        }
+
+        /* ==========================================================
+           7. TARJETAS DE "MI DECISIÓN" Y DIAGNÓSTICO DE KOHLBERG
+           ========================================================== */
+        function renderMyDecisionCards() {
+            let score = { pre: 0, conv: 0, post: 0 };
+            chosenRoute.forEach(r => {
+                if (r.letter === "A") score.pre++;
+                if (r.letter === "B") score.conv++;
+                if (r.letter === "C") score.post++;
+            });
+
+            let summaryTitle = "";
+            let summaryText = "";
+
+            if (score.post >= 2) {
+                summaryTitle = "🌟 Perfil Predominante: Nivel Posconvencional y Autonomía Emocional";
+                summaryText = "En tu árbol predominaron las ramas verdes: tus decisiones se guiaron por principios internos de justicia, empatía y respeto a la dignidad de tus compañeros, manteniendo tu criterio propio incluso frente a la presión de tus amigos (Kohlberg, 1984; Gilligan, 1982; Oliva Delgado, 2004).";
+            } else if (score.conv >= 2) {
+                summaryTitle = "🤝 Perfil Predominante: Nivel Convencional (Influencia Grupal y Normativa)";
+                summaryText = "En tu árbol predominaron las ramas ámbar: tus elecciones buscaron principalmente proteger la lealtad hacia tu amigo cercano, evitar el rechazo del grupo de pares o apegarte literalmente al reglamento sin cuestionarlo (Barra-Almagiá, 1987; Papalia et al., 2009).";
+            } else if (score.pre >= 2) {
+                summaryTitle = "🛡️ Perfil Predominante: Nivel Preconvencional (Autoprotección / Interés Propio)";
+                summaryText = "En tu árbol predominaron las ramas rojas: priorizaste salvar tu nota individual, evitar sanciones directas del docente o actuar según tu conveniencia inmediata (Piaget, 1932; Turiel, 1983).";
+            } else {
+                summaryTitle = "⚖️ Perfil Mixto en Transición (Conflicto Sociocognitivo)";
+                summaryText = "Tu árbol combina los tres colores (rojo, ámbar y verde): según el contexto del día, alternaste entre cuidar tu nota personal, apoyar a tu grupo de amigos y defender principios éticos. Esto demuestra que el razonamiento moral en la juventud varía según la presión del entorno (Papalia et al., 2009).";
+            }
+
+            document.getElementById("globalKohlbergBox").innerHTML = `
+                <h4 class="font-pixel text-xs sm:text-sm text-amber-300 mb-2">${summaryTitle}</h4>
+                <p class="text-xs sm:text-sm text-slate-200 leading-relaxed">${summaryText}</p>
+            `;
+
+            const list = document.getElementById("decisionsCardsList");
+            list.innerHTML = "";
+            chosenRoute.forEach((item) => {
+                const card = document.createElement("div");
+                card.className = "p-4 rounded-xl bg-slate-900/95 border-2 border-slate-700/80";
+                card.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                        <span class="font-pixel text-[10px] text-indigo-300">
+                            RAMA ${item.step} · ${item.place}
+                        </span>
+                        <span class="px-2.5 py-1 rounded border text-xs font-bold ${item.tagClass}">
+                            ${item.kohlberg} (${item.stage})
+                        </span>
+                    </div>
+                    <h5 class="text-sm sm:text-base font-bold text-white mb-2">
+                        ${item.nodeTitle}
+                    </h5>
+                    <div class="p-3 rounded-lg bg-slate-950 border-l-4 mb-2.5 text-xs sm:text-sm text-slate-200" style="border-left-color: ${item.colorHex};">
+                        <strong class="text-amber-300">Lo que elegiste (${item.letter} - ${item.shortLabel}):</strong> "${item.choiceText}"
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-400">
+                        <strong class="text-teal-300">Relación con el Marco Teórico:</strong> ${item.theory}
+                    </p>
+                `;
+                list.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
